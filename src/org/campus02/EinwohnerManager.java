@@ -5,12 +5,20 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class EinwohnerManager {
 
     public static void main(String[] args) throws DataFileException {
-        ArrayList<Einwohner> load = new EinwohnerManager().load();
-        System.out.println(load);
+        ArrayList<Einwohner> einwohners = new EinwohnerManager().load();
+        for (Einwohner einwohner : einwohners) {
+            System.out.println(einwohner);
+        }
+        Collections.sort(einwohners);
+        for (Einwohner einwohner : einwohners) {
+            System.out.println(einwohner);
+        }
     }
 
     public ArrayList<Einwohner> load() throws DataFileException {
@@ -42,6 +50,24 @@ public class EinwohnerManager {
                         Integer.parseInt(einwohnerData[3]));
                 einwohnerList.add(einwohner);
             }
+            // sortiere Liste mittels Comparator
+            //einwohnerList.sort(new GeburtsjahrDescNameAscComparator());
+
+            //sortiere mittels lambda Expression
+//            einwohnerList.sort((einwohner, t1) -> {
+//                int res = Integer.compare(t1.getGeburtsjahr(), einwohner.getGeburtsjahr());
+//                if (res == 0) {
+//                    return einwohner.getName().compareTo(t1.getName());
+//                }
+//                return res;
+//            });
+
+            // sortiere mittels Comparator
+            einwohnerList.sort(Comparator.comparingInt(Einwohner::getGeburtsjahr)
+                    .reversed()
+                    .thenComparing(Einwohner::getName) // wenn gleiches Geburtsjahr, sortiere per name
+            );
+
             return einwohnerList;
         } catch (FileNotFoundException e) {
             throw new DataFileException("File not found", e);
